@@ -8,6 +8,6 @@ https://dotnet.microsoft.com/download/dotnet/5.0
 
 Running application:
 
-Navigate to main folder and run following command from command line:
+Navigate to  project folder and run following command from the command line:
 
 **dotnet run**
