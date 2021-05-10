@@ -13,16 +13,17 @@ namespace bookCollection.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Populate Database with some data
             var books = new List<Book>
             {
                 new Book
                 {
-                    Id = Guid.NewGuid(), Name = "Harry Potter 1", Author = "J.K. Rowling",
+                    Id = Guid.NewGuid(), Name = "HP 1", Author = "JKR",
                     Description = "Story of wizard"
                 },
                 new Book
                 {
-                    Id = Guid.NewGuid(), Name = "Lord of the Rings", Author = "J.R.R Tolkien",
+                    Id = Guid.NewGuid(), Name = "LotR", Author = "JRRT",
                     Description = "Tale of the ring"
                 },
                 new Book
@@ -49,7 +50,6 @@ namespace bookCollection.Models
             public string Author { get; set; }
 
             public string Description { get; set; }
-
         }
     }
 }

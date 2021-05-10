@@ -6,116 +6,109 @@ export default class BookForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            Id: null,
-            Name: '',
-            Author: '',
-            Description: ''
+            id: null,
+            name: '',
+            author: '',
+            description: ''
         };
         this.inputOnChangeHandler = this.inputOnChangeHandler.bind(this);
     }
-    
+
     updateForm = (e) => {
         if (e) {
             this.setState({
-                Id: e.id,
-                Name: e.name,
-                Author: e.author,
-                Description: e.description
+                id: e.id,
+                name: e.name,
+                author: e.author,
+                description: e.description
             });
         }
         else {
             this.setState( {
-                Id: null,
-                Name: '',
-                Author: '',
-                Description: ''
+                id: null,
+                name: '',
+                author: '',
+                description: ''
             });
         }
     };
-    
-    addNewHandler = (e) => {
+
+    addNewHandler = async (e) => {
         e.preventDefault();
-        if (this.state.Id === null) {
-            const data = {
-                Name: this.state.Name,
-                Author: this.state.Author,
-                Description: this.state.Description
-            };
-            addBook(data);
+        const data = {
+            name: this.state.name,
+            author: this.state.author,
+            description: this.state.description
+        };
+        const book = await addBook(data);
+        this.props.handleAdd(book);
+        this.updateForm();
+    };
+
+    updateHandler = async (e) => {
+        e.preventDefault();
+        const book = await updBook(this.state);
+        this.props.handleUpdate(book);
+        this.updateForm();
+    };
+
+    deleteHandler = async (e) => {
+        e.preventDefault();
+        if (this.state.id !== null) {
+            const res = await deleteBook(this.state.id);
+            this.props.handleDelete(res);
             this.updateForm();
         }
-        else {
-            alert("Save new-button can only be used for non-existing books");
-        }
     };
-    
-    updateHandler = (e) => {
-        e.preventDefault();
-        if (this.state.Id === null) {
-            alert("Save-button can only be used for existing books");
-        }
-        else {
-            updBook(this.state);
-            this.updateForm();
-        }
-    };
-    
-    deleteHandler = (e) => {
-        e.preventDefault();
-        if (this.state.Id !== null) {
-            deleteBook(this.state.Id);
-            this.props.handleDelete(this.state.Id);
-            this.updateForm();
-        }
-        else {
-            alert("Need to select book first for deletion");
-        }
-    };
-    
+
     inputOnChangeHandler(e) {
         const target = e.target;
         const value = target.value;
         const name = target.name;
-        
+
         this.setState({
             [name]: value
         });
     }
-    
+
     render()
-        {
-            return (
-                <div className="bookForm">
-                    <h4>Book details:</h4>
-                    <form>
-                        <p>Name:</p>
-                        <input
-                            type='text'
-                            name='Name'
-                            value={this.state.Name}
-                            onChange={this.inputOnChangeHandler}
-                        />
-                        <p>Author:</p>
-                        <input
-                            type='text'
-                            name='Author'
-                            value={this.state.Author}
-                            onChange={this.inputOnChangeHandler}
-                        />
-                        <p>Description</p>
-                        <textarea
-                            name='Description'
-                            value={this.state.Description}
-                            onChange={this.inputOnChangeHandler}
-                        />
-                    </form>
-                    <div>
-                        <button onClick={this.addNewHandler}>Save new</button>
-                        <button onClick={this.updateHandler}>Save</button>
-                        <button onClick={this.deleteHandler}>Delete</button>
-                    </div>
+    {
+        return (
+            <div className="bookForm">
+                <h4>Book details:</h4>
+                <form>
+                    <p>Name:</p>
+                    <input
+                        type='text'
+                        name='name'
+                        value={this.state.name}
+                        onChange={this.inputOnChangeHandler}
+                        required='required'
+                    />
+                    <p>Author:</p>
+                    <input
+                        type='text'
+                        name='author'
+                        value={this.state.author}
+                        onChange={this.inputOnChangeHandler}
+                        required='required'
+                    />
+                    <p>Description</p>
+                    <textarea
+                        name='description'
+                        value={this.state.description}
+                        onChange={this.inputOnChangeHandler}
+                    />
+                </form>
+                <div>
+                    <button onClick={this.addNewHandler}
+                            disabled={!this.state.name || !this.state.author || !!this.state.id}>
+                        Save new</button>
+                    <button onClick={this.updateHandler} disabled={!this.state.id}>Save</button>
+                    <button onClick={this.deleteHandler} disabled={!this.state.id}>Delete</button>
                 </div>
-            )
-        }
+            </div>
+        )
+    }
 }
 

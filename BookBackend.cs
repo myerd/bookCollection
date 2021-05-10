@@ -3,55 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using bookCollection.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace bookCollection
 {
-    
     public class BookBackend : IBookBackend
     {
         private readonly BookDBContext _bookDbContext = new BookDBContext();
 
-        public Task<List<BookDBContext.Book>> GetBooks()
+        public async Task<List<BookDBContext.Book>> GetBooks()
         {
-            var books = _bookDbContext.Books.ToList();
-            return Task.FromResult(books);
+            return await _bookDbContext.Books.ToListAsync();
         }
 
-        public Task<BookDBContext.Book> AddBook(BookDBContext.Book book)
+        public async Task<BookDBContext.Book> AddBook(BookDBContext.Book book)
         {
-            var bk = new BookDBContext.Book();
-            bk.Id = new Guid();
-            bk.Name = book.Name;
-            bk.Author = book.Author;
-            bk.Description = book.Description;
+            var bk = new BookDBContext.Book
+            {
+                Id = new Guid(),
+                Name = book.Name,
+                Author = book.Author,
+                Description = book.Description,
+            };
 
             _bookDbContext.Books.Add(bk);
-            _bookDbContext.SaveChanges();
+            await _bookDbContext.SaveChangesAsync();
 
-            return Task.FromResult(bk);
+            return bk;
         }
 
-        public Task<BookDBContext.Book> UpdateBook(BookDBContext.Book book)
+        public async Task<BookDBContext.Book> UpdateBook(BookDBContext.Book book)
         {
             var bk = _bookDbContext.Books.Find(book.Id);
             bk.Name = book.Name;
             bk.Author = book.Author;
             bk.Description = book.Description;
+            
             _bookDbContext.Books.Update(bk);
-            _bookDbContext.SaveChanges();
+            await _bookDbContext.SaveChangesAsync();
 
-            return Task.FromResult(bk);
+            return bk;
         }
 
-        public Task<Guid> DeleteBook(Guid bookId)
+        public async Task<ActionResult<Guid>> DeleteBook(Guid bookId)
         {
             var book = _bookDbContext.Books.FirstOrDefault(t => t.Id == bookId);
-            if (book != null) {
-                _bookDbContext.Books.Remove(book);
-                _bookDbContext.SaveChanges();
+            if (book == null) {
+                return new NotFoundResult();
             }
 
-            return Task.FromResult(bookId);
+            _bookDbContext.Books.Remove(book);
+            await _bookDbContext.SaveChangesAsync();
+            return bookId;
         }
     }
 }

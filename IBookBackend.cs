@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using bookCollection.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace bookCollection
 {
@@ -13,6 +14,6 @@ namespace bookCollection
 
         Task<BookDBContext.Book> UpdateBook(BookDBContext.Book book);
 
-        Task<Guid> DeleteBook(Guid bookId);
+        Task<ActionResult<Guid>> DeleteBook(Guid bookId);
     }
 }

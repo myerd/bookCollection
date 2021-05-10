@@ -9,7 +9,7 @@ namespace bookCollection.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class BookController
+    public class BookController : ControllerBase
     {
         private readonly IBookBackend _backend;
 
@@ -17,6 +17,7 @@ namespace bookCollection.Controllers
         {
             _backend = backend;
         }
+        
         [HttpGet]
         [ProducesResponseType(typeof(List<BookDBContext.Book>), 200)]
         public async Task<List<BookDBContext.Book>> GetBooks()
@@ -29,8 +30,7 @@ namespace bookCollection.Controllers
         public async Task<IActionResult> CreateBook(
             [FromBody] BookDBContext.Book book)
         {
-            var bk = await _backend.AddBook(book);
-            return new StatusCodeResult(200);
+            return Ok(await _backend.AddBook(book));
         }
 
         [HttpPut]
@@ -38,17 +38,15 @@ namespace bookCollection.Controllers
         public async Task<IActionResult> UpdateBook(
             [FromBody] BookDBContext.Book book)
         {
-            var bk = await _backend.UpdateBook(book);
-            return new StatusCodeResult(200);
+            return Ok(await _backend.UpdateBook(book));
         }
 
         [HttpDelete]
         [ProducesResponseType(typeof(BookDBContext.Book), 200)]
-        public async Task<Guid> DeleteBook(
+        public async Task<ActionResult<Guid>> DeleteBook(
             [FromBody] Guid bookId)
         {
             return await _backend.DeleteBook(bookId);
         }
-
     }
 }

@@ -12,31 +12,48 @@ export default class BookList extends React.Component {
             error: null
         };
         this.handleDelete = this.handleDelete.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
+        this.handleAdd = this.handleAdd.bind(this);
     }
 
-    componentDidMount() {
-        this.setState({ isLoading: true});
+    fetchBooks() {
+        this.setState(prevState => ({ ...prevState, isLoading: true}));
         getBooks()
-            .then(data =>
-                this.setState({bookList: data, isLoading: false}))
-            .catch(error => this.setState({error, isLoading: false}));
+            .then(data => this.setState(prevState => ({ ...prevState, bookList: data, isLoading: false})))
+            .catch(error => this.setState(prevState => ({ ...prevState, error, isLoading: false})));
+    }
+    
+    componentDidMount() {
+        this.fetchBooks();
     }
     
     componentDidUpdate(prevProps) {
         if (this.props.bookList !== prevProps.bookList) {
-            getBooks()
-                .then(data =>
-                this.setState( {bookList: data}))
-                .catch(error => this.setState({error}));
+           this.fetchBooks();
         }
     }
 
+    // Functions to handle state management
     handleDelete(id) {
         this.setState(prevState => ({
-            bookList: prevState.bookList.filter(book => book.Id !== id)}));
+            ...prevState,
+            bookList: prevState.bookList.filter(book => book.id !== id)
+        }));
     }
 
+    handleUpdate(book) {
+        const bk = this.state.bookList.findIndex(b => b.id === book.id),
+        bookList = [...this.state.bookList];
+        bookList[bk] = book;
+        this.setState(prevState => ({ ...prevState, bookList }));
+    }
 
+    handleAdd(book) {
+        const bookList = [...this.state.bookList, book];
+        this.setState(prevState => ({ ...prevState, bookList }));
+    }
+    
+    // Function to pass Book-data to form
     click(e) {
         this.bookForm.updateForm(e);
     }
@@ -44,21 +61,17 @@ export default class BookList extends React.Component {
     render() {
         const { bookList, isLoading, error} = this.state;
 
-        if (error) {
-            return <p>{error.message}</p>
-        }
-
-        if (isLoading) {
-            return <p>Loading...</p>
-        }
-
         return (
             <div className="row">
                 <div className="bookForm">
                     <BookForm ref={(ip) => (this.bookForm = ip)}
-                    handleDelete={this.handleDelete}/>
+                    handleDelete={this.handleDelete}
+                    handleUpdate={this.handleUpdate}
+                    handleAdd={this.handleAdd}/>
                 </div>
                 <div className="bookList">
+                    {error ? <p>{error.message}</p> : null}
+                    {isLoading ? <p>Loading...</p> : null}
                     <h4>Books in database:</h4>
                     <ul>
                         {bookList.map(book =>
